@@ -11,7 +11,7 @@ namespace SeleniumTask.Pages
 
         public string GetItemTotalText()
         {
-            return Driver.FindElement(ItemTotalLabel).Text; // Format: "Item total: $29.99"
+            return Driver.FindElement(ItemTotalLabel).Text;
         }
 
         public void ClickFinish()

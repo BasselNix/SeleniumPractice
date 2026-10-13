@@ -13,7 +13,6 @@ namespace SeleniumTask.Tests
         {
             base.SetUp();
 
-            // Task 3 Step 1: Log into store in Setup
             _loginPage = new LoginPage(Driver);
             _loginPage.Login("standard_user", "secret_sauce");
             _productsPage = new ProductsPage(Driver);
@@ -24,11 +23,9 @@ namespace SeleniumTask.Tests
         [TestCase("Sauce Labs Bike Light")]
         public void VerifyProductPriceInCart(string productName)
         {
-            // Task 3 Step 2: Remember price and add item to cart
             var expectedData = _productsPage.GetItemData(productName);
             _productsPage.AddItemToCart(productName);
 
-            // Task 3 Step 3: Go to cart and check price
             _productsPage.GoToCart();
             var cartPage = new CartPage(Driver);
             var cartItemData = cartPage.GetCartItemData(productName);
@@ -39,19 +36,7 @@ namespace SeleniumTask.Tests
         [TearDown]
         public override void TearDown()
         {
-            // Task 3 Step 4: Reset App State in TearDown
-            if (Driver != null)
-            {
-                try
-                {
-                    _productsPage.ResetAppState();
-                }
-                catch
-                {
-                    // Fallback log if reset fails prior to quit
-                }
-            }
-
+            _productsPage.ResetAppState();
             base.TearDown();
         }
     }

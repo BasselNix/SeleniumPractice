@@ -22,7 +22,7 @@ namespace SeleniumTask.Pages
         public void SelectSortOption(string value)
         {
             var selectElement = new SelectElement(Driver.FindElement(SortDropdown));
-            selectElement.SelectByValue(value); // "lohi" for Price (Low to High)
+            selectElement.SelectByValue(value);
         }
 
         public List<decimal> GetProductPrices()
