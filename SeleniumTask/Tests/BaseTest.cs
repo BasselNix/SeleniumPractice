@@ -15,8 +15,15 @@ namespace SeleniumTask.Tests
             var options = new ChromeOptions();
             options.AddArgument("--start-maximized");
 
+            // Disable password saving prompt
+            options.AddUserProfilePreference("credentials_enable_service", false);
+            options.AddUserProfilePreference("profile.password_manager_enabled", false);
+
+            // Disable the "Change your password / compromised password" leak detection warning
+            options.AddUserProfilePreference("profile.password_manager_leak_detection", false);
+
             Driver = new ChromeDriver(options);
-            Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(5);
+            Driver.Manage().Timeouts().ImplicitWait = TimeSpan.FromSeconds(10);
             Driver.Navigate().GoToUrl(BaseUrl);
             Console.WriteLine($"[LOG] Web Driver loaded. Navigated to {BaseUrl}");
         }
