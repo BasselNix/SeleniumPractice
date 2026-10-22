@@ -8,10 +8,10 @@ namespace SeleniumTask.Pages
     {
         public CheckoutStepOnePage(IWebDriver driver) : base(driver) { }
 
-        private By FirstNameInput => By.Id("first-name");
-        private By LastNameInput => By.Id("last-name");
-        private By PostalCodeInput => By.Id("postal-code");
-        private By ContinueButton => By.Id("continue");
+        private By FirstNameInput => By.XPath("//input[@placeholder='First Name']");
+        private By LastNameInput => By.XPath("//input[@placeholder='Last Name']");
+        private By PostalCodeInput => By.XPath("//input[@placeholder='Zip/Postal Code']");
+        private By ContinueButton => By.XPath("//input[@value='Continue']");
 
         public void FillFormAndContinue(string firstName, string lastName, string postalCode)
         {

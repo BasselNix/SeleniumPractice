@@ -7,9 +7,9 @@ namespace SeleniumTask.Pages
     {
         public LoginPage(IWebDriver driver) : base(driver) { }
 
-        private By UsernameInput => By.Id("user-name");
-        private By PasswordInput => By.Id("password");
-        private By LoginButton => By.Id("login-button");
+        private By UsernameInput => By.XPath("//input[@placeholder='Username']");
+        private By PasswordInput => By.XPath("//input[@placeholder='Password']");
+        private By LoginButton => By.XPath("//input[@value='Login']");
         private By LoginLogo => By.ClassName("login_logo");
         private By ErrorMessage => By.CssSelector("h3[data-test='error']");
         private By CloseErrorButton => By.ClassName("error-button");
