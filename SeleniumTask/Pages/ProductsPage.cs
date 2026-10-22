@@ -1,6 +1,7 @@
 ﻿using OpenQA.Selenium;
 using OpenQA.Selenium.Support.UI;
 using SeleniumTask.Models;
+using SeleniumTask.Utilities;
 
 namespace SeleniumTask.Pages
 {
@@ -16,11 +17,7 @@ namespace SeleniumTask.Pages
 
         public bool IsInventoryContainerDisplayed()
         {
-            return Wait.Until(d =>
-            {
-                var elements = d.FindElements(InventoryContainer);
-                return elements.Count > 0 && elements[0].Displayed;
-            });
+            return Driver.IsElementDisplayed(InventoryContainer);
         }
 
         public void SelectSortOption(string value)
@@ -101,7 +98,7 @@ namespace SeleniumTask.Pages
 
         public bool IsCartBadgeDisplayed()
         {
-            return Wait.Until(d => { return d.FindElements(ShoppingCartBadge); }).Count > 0;
+            return Driver.IsElementDisplayed(ShoppingCartBadge);
         }
 
         public void GoToCart()

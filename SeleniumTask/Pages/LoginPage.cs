@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using SeleniumTask.Utilities;
 
 namespace SeleniumTask.Pages
 {
@@ -37,7 +38,7 @@ namespace SeleniumTask.Pages
 
         public bool IsLoginLogoDisplayed()
         {
-            return Driver.FindElements(LoginLogo).Count > 0 && Driver.FindElement(LoginLogo).Displayed;
+            return Driver.IsElementDisplayed(LoginLogo);
         }
 
         public string GetErrorMessageText()
@@ -52,7 +53,7 @@ namespace SeleniumTask.Pages
 
         public bool IsErrorMessageDisplayed()
         {
-            return Driver.FindElements(ErrorMessage).Count > 0;
+            return Driver.IsElementDisplayed(ErrorMessage);
         }
     }
 }
