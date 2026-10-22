@@ -1,4 +1,6 @@
 ﻿using OpenQA.Selenium;
+using OpenQA.Selenium.Support.UI;
+using SeleniumExtras.WaitHelpers;
 
 namespace SeleniumTask.Pages
 {
@@ -13,10 +15,10 @@ namespace SeleniumTask.Pages
 
         public void FillFormAndContinue(string firstName, string lastName, string postalCode)
         {
-            Driver.FindElement(FirstNameInput).SendKeys(firstName);
-            Driver.FindElement(LastNameInput).SendKeys(lastName);
-            Driver.FindElement(PostalCodeInput).SendKeys(postalCode);
-            Driver.FindElement(ContinueButton).Click();
+            Wait.Until(d => d.FindElement(FirstNameInput)).SendKeys(firstName);
+            Wait.Until(d => d.FindElement(LastNameInput)).SendKeys(lastName);
+            Wait.Until(d => d.FindElement(PostalCodeInput)).SendKeys(postalCode);
+            Wait.Until(d => d.FindElement(ContinueButton)).Click();
         }
     }
 }

@@ -12,16 +12,36 @@ namespace SeleniumTask.Pages
 
         private IWebElement GetCartItem(string productName)
         {
-            var items = Driver.FindElements(By.ClassName("cart_item"));
-            foreach (var item in items)
+            try
             {
-                var title = item.FindElement(By.ClassName("inventory_item_name")).Text;
-                if (title.Equals(productName, StringComparison.OrdinalIgnoreCase))
+                return Wait.Until(d =>
                 {
-                    return item;
-                }
+                    var items = Driver.FindElements(By.ClassName("cart_item"));
+
+                    foreach (var item in items)
+                    {
+                        try
+                        {
+                            var title = item.FindElement(By.ClassName("inventory_item_name")).Text;
+                            if (title.Equals(productName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return item;
+                            }
+                        }
+                        catch (NoSuchElementException)
+                        {
+                            // Do nothing and let the loop continue checking other cards.
+                        }
+                    }
+
+                    // If no matching product name is found yet, return null to force Wait.Until to retry
+                    return null;
+                });
             }
-            throw new NoSuchElementException($"Cart item '{productName}' not found.");
+            catch (WebDriverTimeoutException)
+            {
+                throw new NoSuchElementException($"Product '{productName}' not found on the page within the timeout period.");
+            }
         }
 
         public ItemData GetCartItemData(string productName)
@@ -43,12 +63,12 @@ namespace SeleniumTask.Pages
 
         public void ClickContinueShopping()
         {
-            Driver.FindElement(ContinueShoppingButton).Click();
+            Wait.Until(d => { return d.FindElement(ContinueShoppingButton); }).Click();
         }
 
         public void ClickCheckout()
         {
-            Driver.FindElement(CheckoutButton).Click();
+            Wait.Until(d => { return d.FindElement(CheckoutButton); }).Click();
         }
     }
 }

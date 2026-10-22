@@ -16,7 +16,11 @@ namespace SeleniumTask.Pages
 
         public bool IsInventoryContainerDisplayed()
         {
-            return Driver.FindElements(InventoryContainer).Count > 0;
+            return Wait.Until(d =>
+            {
+                var elements = d.FindElements(InventoryContainer);
+                return elements.Count > 0 && elements[0].Displayed;
+            });
         }
 
         public void SelectSortOption(string value)
@@ -35,16 +39,36 @@ namespace SeleniumTask.Pages
 
         private IWebElement GetItemCard(string productName)
         {
-            var items = Driver.FindElements(By.ClassName("inventory_item"));
-            foreach (var item in items)
+            try
             {
-                var title = item.FindElement(By.ClassName("inventory_item_name")).Text;
-                if (title.Equals(productName, StringComparison.OrdinalIgnoreCase))
+                return Wait.Until(d =>
                 {
-                    return item;
-                }
+                    var cards = d.FindElements(By.ClassName("inventory_item"));
+
+                    foreach (var card in cards)
+                    {
+                        try
+                        {
+                            var titleElement = card.FindElement(By.ClassName("inventory_item_name"));
+                            if (titleElement.Text.Equals(productName, StringComparison.OrdinalIgnoreCase))
+                            {
+                                return card;
+                            }
+                        }
+                        catch (NoSuchElementException)
+                        {
+                            // Do nothing and let the loop continue checking other cards.
+                        }
+                    }
+
+                    // If no matching product name is found yet, return null to force Wait.Until to retry
+                    return null;
+                });
             }
-            throw new NoSuchElementException($"Product '{productName}' not found on page.");
+            catch (WebDriverTimeoutException)
+            {
+                throw new NoSuchElementException($"Product '{productName}' not found on the page within the timeout period.");
+            }
         }
 
         public void AddItemToCart(string productName)
@@ -72,17 +96,17 @@ namespace SeleniumTask.Pages
 
         public string GetCartBadgeText()
         {
-            return Driver.FindElement(ShoppingCartBadge).Text;
+            return Wait.Until(d => { return d.FindElement(ShoppingCartBadge); }).Text;
         }
 
         public bool IsCartBadgeDisplayed()
         {
-            return Driver.FindElements(ShoppingCartBadge).Count > 0;
+            return Wait.Until(d => { return d.FindElements(ShoppingCartBadge); }).Count > 0;
         }
 
         public void GoToCart()
         {
-            Driver.FindElement(ShoppingCartLink).Click();
+            Wait.Until(d => { return d.FindElement(ShoppingCartLink); }).Click();
         }
     }
 }

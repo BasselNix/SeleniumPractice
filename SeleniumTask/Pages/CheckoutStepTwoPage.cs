@@ -11,7 +11,7 @@ namespace SeleniumTask.Pages
 
         public string GetItemTotalText()
         {
-            return Driver.FindElement(ItemTotalLabel).Text;
+            return Wait.Until(d => { return d.FindElement(ItemTotalLabel).Text; });
         }
 
         public void ClickFinish()
