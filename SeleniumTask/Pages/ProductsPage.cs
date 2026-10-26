@@ -7,6 +7,8 @@ namespace SeleniumTask.Pages
 {
     public class ProductsPage(IWebDriver driver) : BasePage(driver)
     {
+        private static By MenuButton => By.Id("react-burger-menu-btn");
+        private static By ResetSidebarLink => By.Id("reset_sidebar_link");
         private static By InventoryContainer => By.Id("inventory_container");
         private static By SortDropdown => By.ClassName("product_sort_container");
         private static By ItemPrices => By.ClassName("inventory_item_price");
@@ -20,6 +22,14 @@ namespace SeleniumTask.Pages
            By.XPath($"//div[@class='inventory_item' and .//div[starts-with(@class, 'inventory_item_name') and text()='{productName}']]//div[@class='inventory_item_price']");
         private static By GetAddToCartButtonLocator(string productName) =>
             By.XPath($"//div[@class='inventory_item' and .//div[starts-with(@class, 'inventory_item_name') and text()='{productName}']]//button");
+
+        public void ResetAppState()
+        {
+            // Open sidebar menu
+            Wait.Until(d => d.FindElement(MenuButton)).Click();
+            // Wait for the sidebar slide-out animation to finish, making the reset link available
+            Wait.Until(d => d.FindElement(ResetSidebarLink).Displayed ? d.FindElement(ResetSidebarLink) : null)!.Click();
+        }
 
         public enum ProductSortOption
         {
