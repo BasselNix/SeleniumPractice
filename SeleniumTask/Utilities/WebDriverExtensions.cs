@@ -10,15 +10,24 @@ namespace SeleniumTask.Utilities
             try
             {
                 var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
-                return wait.Until(d =>
-                {
-                    var elements = d.FindElements(locator);
-                    return elements.Count > 0 && elements[0].Displayed;
-                });
+                return wait.Until(d => d.FindElement(locator).Displayed);
             }
             catch (WebDriverTimeoutException)
             {
                 return false;
+            }
+        }
+
+        public static bool IsElementHidden(this IWebDriver driver, By locator, int timeoutSeconds = 10)
+        {
+            try
+            {
+                var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+                return wait.Until(d => !d.FindElement(locator).Displayed);
+            }
+            catch (WebDriverTimeoutException)
+            {
+                return true;
             }
         }
     }

@@ -1,23 +1,30 @@
 ﻿using SeleniumTask.Pages;
+using static SeleniumTask.Pages.ProductsPage;
 
 namespace SeleniumTask.Tests
 {
     [TestFixture]
     public class Task2Tests : BaseTest
     {
+        private LoginPage _loginPage;
+
+        [SetUp]
+        public void Task2SetUp()
+        {
+            _loginPage = new LoginPage(Driver);
+        }
+
         [Test]
         public void Task2Scenario()
         {
-            var loginPage = new LoginPage(Driver);
-
-            loginPage.Login("standard_user", "secret_sauce");
+            _loginPage.Login("standard_user", "secret_sauce");
 
             // Check inventory container present
             var productsPage = new ProductsPage(Driver);
             Assert.That(productsPage.IsInventoryContainerDisplayed(), Is.True, "Product list page container is not displayed.");
 
             // Change sorting to Price (Low to High)
-            productsPage.SelectSortOption("lohi");
+            productsPage.SelectSortOption(ProductSortOption.lohi);
 
             // Verify prices are sorted low to high
             List<decimal> prices = productsPage.GetProductPrices();
@@ -45,7 +52,7 @@ namespace SeleniumTask.Tests
 
             // Click Remove & verify cart badge counter is not displayed
             cartPage.RemoveItem(targetProduct1);
-            Assert.That(productsPage.IsCartBadgeDisplayed(), Is.False, "Cart count badge should not be displayed after removing all items.");
+            Assert.That(productsPage.IsCartBadgeHidden(), Is.True, "Cart count badge should not be displayed after removing all items.");
 
             // Return to products page via 'Continue Shopping'
             cartPage.ClickContinueShopping();

@@ -13,7 +13,7 @@ namespace SeleniumTask.Tests
         protected const string BaseUrl = "https://www.saucedemo.com/";
 
         [SetUp]
-        public virtual void SetUp()
+        public void SetUp()
         {
             _loggerFactory = LoggerFactory.Create(builder =>
             {
@@ -50,7 +50,7 @@ namespace SeleniumTask.Tests
             if (Driver != null)
             {
                 Logger.LogInformation("Quitting Web Driver instance...");
-                Driver.Quit();
+                Driver.Dispose();
             }
             _loggerFactory.Dispose();
         }

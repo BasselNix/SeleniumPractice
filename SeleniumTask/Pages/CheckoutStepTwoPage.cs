@@ -2,21 +2,13 @@
 
 namespace SeleniumTask.Pages
 {
-    public class CheckoutStepTwoPage : BasePage
+    public class CheckoutStepTwoPage(IWebDriver driver) : BasePage(driver)
     {
-        public CheckoutStepTwoPage(IWebDriver driver) : base(driver) { }
+        private static By ItemTotalLabel => By.ClassName("summary_subtotal_label");
+        private static By FinishButton => By.Id("finish");
 
-        private By ItemTotalLabel => By.ClassName("summary_subtotal_label");
-        private By FinishButton => By.Id("finish");
+        public string GetItemTotalText() => Wait.Until(d => { return d.FindElement(ItemTotalLabel).Text; });
 
-        public string GetItemTotalText()
-        {
-            return Wait.Until(d => { return d.FindElement(ItemTotalLabel).Text; });
-        }
-
-        public void ClickFinish()
-        {
-            Driver.FindElement(FinishButton).Click();
-        }
+        public void ClickFinish() => Driver.FindElement(FinishButton).Click();
     }
 }

@@ -9,10 +9,8 @@ namespace SeleniumTask.Tests
         private ProductsPage _productsPage;
 
         [SetUp]
-        public override void SetUp()
+        public void Task3SetUp()
         {
-            base.SetUp();
-
             _loginPage = new LoginPage(Driver);
             _loginPage.Login("standard_user", "secret_sauce");
             _productsPage = new ProductsPage(Driver);

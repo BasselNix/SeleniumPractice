@@ -5,105 +5,65 @@ using SeleniumTask.Utilities;
 
 namespace SeleniumTask.Pages
 {
-    public class ProductsPage : BasePage
+    public class ProductsPage(IWebDriver driver) : BasePage(driver)
     {
-        public ProductsPage(IWebDriver driver) : base(driver) { }
+        private static By InventoryContainer => By.Id("inventory_container");
+        private static By SortDropdown => By.ClassName("product_sort_container");
+        private static By ItemPrices => By.ClassName("inventory_item_price");
+        private static By ShoppingCartBadge => By.ClassName("shopping_cart_badge");
+        private static By ShoppingCartLink => By.ClassName("shopping_cart_link");
+        private static By GetItemNameLocator(string productName) =>
+            By.XPath($"//div[@class='inventory_item']//div[starts-with(@class, 'inventory_item_name') and text()='{productName}']");
+        private static By GetItemDescLocator(string productName) =>
+            By.XPath($"//div[@class='inventory_item' and .//div[starts-with(@class, 'inventory_item_name') and text()='{productName}']]//div[@class='inventory_item_desc']");
+        private static By GetItemPriceLocator(string productName) =>
+           By.XPath($"//div[@class='inventory_item' and .//div[starts-with(@class, 'inventory_item_name') and text()='{productName}']]//div[@class='inventory_item_price']");
+        private static By GetAddToCartButtonLocator(string productName) =>
+            By.XPath($"//div[@class='inventory_item' and .//div[starts-with(@class, 'inventory_item_name') and text()='{productName}']]//button");
 
-        private By InventoryContainer => By.Id("inventory_container");
-        private By SortDropdown => By.ClassName("product_sort_container");
-        private By ItemPrices => By.ClassName("inventory_item_price");
-        private By ShoppingCartBadge => By.ClassName("shopping_cart_badge");
-        private By ShoppingCartLink => By.ClassName("shopping_cart_link");
-
-        public bool IsInventoryContainerDisplayed()
+        public enum ProductSortOption
         {
-            return Driver.IsElementDisplayed(InventoryContainer);
+            az,
+            za,
+            lohi,
+            hilo
         }
 
-        public void SelectSortOption(string value)
+        public bool IsInventoryContainerDisplayed() => Driver.IsElementDisplayed(InventoryContainer);
+
+        public void SelectSortOption(ProductSortOption sortOption)
         {
             var selectElement = new SelectElement(Driver.FindElement(SortDropdown));
-            selectElement.SelectByValue(value);
+            selectElement.SelectByValue(sortOption.ToString());
         }
 
         public List<decimal> GetProductPrices()
         {
-            var priceElements = Driver.FindElements(ItemPrices);
-            return priceElements
+            // Wait until at least one price element is visible on the page
+            Wait.Until(d => d.FindElements(ItemPrices).Any(e => e.Displayed));
+
+            return Driver.FindElements(ItemPrices)
                 .Select(e => decimal.Parse(e.Text.Replace("$", "")))
                 .ToList();
         }
+        public void AddItemToCart(string productName) => Wait.Until(d => d.FindElement(GetAddToCartButtonLocator(productName))).Click();
 
-        private IWebElement GetItemCard(string productName)
-        {
-            try
+        public string GetItemButtonText(string productName) => Wait.Until(d => d.FindElement(GetAddToCartButtonLocator(productName))).Text;
+
+        public ItemData GetItemData(string productName) =>
+            new ItemData
             {
-                return Wait.Until(d =>
-                {
-                    var cards = d.FindElements(By.ClassName("inventory_item"));
-
-                    foreach (var card in cards)
-                    {
-                        try
-                        {
-                            var titleElement = card.FindElement(By.ClassName("inventory_item_name"));
-                            if (titleElement.Text.Equals(productName, StringComparison.OrdinalIgnoreCase))
-                            {
-                                return card;
-                            }
-                        }
-                        catch (NoSuchElementException)
-                        {
-                            // Do nothing and let the loop continue checking other cards.
-                        }
-                    }
-
-                    // If no matching product name is found yet, return null to force Wait.Until to retry
-                    return null;
-                });
-            }
-            catch (WebDriverTimeoutException)
-            {
-                throw new NoSuchElementException($"Product '{productName}' not found on the page within the timeout period.");
-            }
-        }
-
-        public void AddItemToCart(string productName)
-        {
-            var card = GetItemCard(productName);
-            card.FindElement(By.TagName("button")).Click();
-        }
-
-        public string GetItemButtonText(string productName)
-        {
-            var card = GetItemCard(productName);
-            return card.FindElement(By.TagName("button")).Text;
-        }
-
-        public ItemData GetItemData(string productName)
-        {
-            var card = GetItemCard(productName);
-            return new ItemData
-            {
-                Name = card.FindElement(By.ClassName("inventory_item_name")).Text,
-                Description = card.FindElement(By.ClassName("inventory_item_desc")).Text,
-                Price = card.FindElement(By.ClassName("inventory_item_price")).Text
+                Name = Wait.Until(d => d.FindElement(GetItemNameLocator(productName))).Text,
+                Description = Wait.Until(d => d.FindElement(GetItemDescLocator(productName))).Text,
+                Price = Wait.Until(d => d.FindElement(GetItemPriceLocator(productName))).Text,
             };
-        }
 
-        public string GetCartBadgeText()
-        {
-            return Wait.Until(d => { return d.FindElement(ShoppingCartBadge); }).Text;
-        }
+        public string GetCartBadgeText() => Wait.Until(d => { return d.FindElement(ShoppingCartBadge); }).Text;
 
-        public bool IsCartBadgeDisplayed()
-        {
-            return Driver.IsElementDisplayed(ShoppingCartBadge);
-        }
+        public bool IsCartBadgeDisplayed() => Driver.IsElementDisplayed(ShoppingCartBadge);
 
-        public void GoToCart()
-        {
-            Wait.Until(d => { return d.FindElement(ShoppingCartLink); }).Click();
-        }
+        public bool IsCartBadgeHidden() => Driver.IsElementHidden(ShoppingCartBadge);
+
+        public void GoToCart() => Wait.Until(d => { return d.FindElement(ShoppingCartLink); }).Click();
     }
 }

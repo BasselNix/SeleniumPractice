@@ -1,20 +1,12 @@
 ﻿using OpenQA.Selenium;
+using SeleniumTask.Utilities;
 
 namespace SeleniumTask.Pages
 {
-    public class CheckoutCompletePage : BasePage
+    public class CheckoutCompletePage(IWebDriver driver) : BasePage(driver)
     {
-        public CheckoutCompletePage(IWebDriver driver) : base(driver) { }
+        private static By PonyExpressImage => By.CssSelector("img[alt='Pony Express']");
 
-        private By PonyExpressImage => By.CssSelector("img[alt='Pony Express']");
-
-        public bool IsPonyExpressImageDisplayed()
-        {
-            return Wait.Until(d =>
-            {
-                var elements = d.FindElements(PonyExpressImage);
-                return elements.Count > 0 && elements[0].Displayed;
-            });
-        }
+        public bool IsPonyExpressImageDisplayed() => Driver.IsElementDisplayed(PonyExpressImage);
     }
 }

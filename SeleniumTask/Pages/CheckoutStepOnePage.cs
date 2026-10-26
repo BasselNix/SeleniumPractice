@@ -1,17 +1,13 @@
 ﻿using OpenQA.Selenium;
-using OpenQA.Selenium.Support.UI;
-using SeleniumExtras.WaitHelpers;
 
 namespace SeleniumTask.Pages
 {
-    public class CheckoutStepOnePage : BasePage
+    public class CheckoutStepOnePage(IWebDriver driver) : BasePage(driver)
     {
-        public CheckoutStepOnePage(IWebDriver driver) : base(driver) { }
-
-        private By FirstNameInput => By.XPath("//input[@placeholder='First Name']");
-        private By LastNameInput => By.XPath("//input[@placeholder='Last Name']");
-        private By PostalCodeInput => By.XPath("//input[@placeholder='Zip/Postal Code']");
-        private By ContinueButton => By.XPath("//input[@value='Continue']");
+        private static By FirstNameInput => By.XPath("//input[@placeholder='First Name']");
+        private static By LastNameInput => By.XPath("//input[@placeholder='Last Name']");
+        private static By PostalCodeInput => By.XPath("//input[@placeholder='Zip/Postal Code']");
+        private static By ContinueButton => By.XPath("//input[@value='Continue']");
 
         public void FillFormAndContinue(string firstName, string lastName, string postalCode)
         {
