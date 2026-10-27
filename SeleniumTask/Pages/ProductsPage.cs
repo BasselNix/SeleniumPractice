@@ -2,6 +2,7 @@
 using OpenQA.Selenium.Support.UI;
 using SeleniumTask.Models;
 using SeleniumTask.Utilities;
+using System.Globalization;
 
 namespace SeleniumTask.Pages
 {
@@ -28,23 +29,32 @@ namespace SeleniumTask.Pages
             // Open sidebar menu
             Wait.Until(d => d.FindElement(MenuButton)).Click();
             // Wait for the sidebar slide-out animation to finish, making the reset link available
-            Wait.Until(d => d.FindElement(ResetSidebarLink).Displayed ? d.FindElement(ResetSidebarLink) : null)!.Click();
+            Wait.Until(d => d.FindElement(ResetSidebarLink).Displayed ? d.FindElement(ResetSidebarLink) : null).Click();
         }
 
         public enum ProductSortOption
         {
-            az,
-            za,
-            lohi,
-            hilo
+            ByNameAscending,
+            ByNameDescending,
+            ByPriceLowToHigh,
+            ByPriceHighToLow
         }
 
         public bool IsInventoryContainerDisplayed() => Driver.IsElementDisplayed(InventoryContainer);
 
+        private static string GetSortOptionValue(ProductSortOption option) => option switch
+        {
+            ProductSortOption.ByNameAscending => "az",
+            ProductSortOption.ByNameDescending => "za",
+            ProductSortOption.ByPriceLowToHigh => "lohi",
+            ProductSortOption.ByPriceHighToLow => "hilo",
+            _ => throw new ArgumentOutOfRangeException(nameof(option), option, $"Failed to find sort option: {option}")
+        };
+
         public void SelectSortOption(ProductSortOption sortOption)
         {
             var selectElement = new SelectElement(Driver.FindElement(SortDropdown));
-            selectElement.SelectByValue(sortOption.ToString());
+            selectElement.SelectByValue(GetSortOptionValue(sortOption));
         }
 
         public List<decimal> GetProductPrices()
@@ -53,10 +63,11 @@ namespace SeleniumTask.Pages
             Wait.Until(d => d.FindElements(ItemPrices).Any(e => e.Displayed));
 
             return Driver.FindElements(ItemPrices)
-                .Select(e => decimal.Parse(e.Text.Replace("$", "")))
+                .Select(e => decimal.Parse(e.Text.Replace("$", "").Trim(), CultureInfo.InvariantCulture))
                 .ToList();
         }
-        public void AddItemToCart(string productName) => Wait.Until(d => d.FindElement(GetAddToCartButtonLocator(productName))).Click();
+
+        public void AddItemToCart(string productName) => Driver.ClickWhenReady(GetAddToCartButtonLocator(productName));
 
         public string GetItemButtonText(string productName) => Wait.Until(d => d.FindElement(GetAddToCartButtonLocator(productName))).Text;
 
@@ -68,12 +79,12 @@ namespace SeleniumTask.Pages
                 Price = Wait.Until(d => d.FindElement(GetItemPriceLocator(productName))).Text,
             };
 
-        public string GetCartBadgeText() => Wait.Until(d => { return d.FindElement(ShoppingCartBadge); }).Text;
+        public string GetCartBadgeText() => Wait.Until(d => d.FindElement(ShoppingCartBadge)).Text;
 
         public bool IsCartBadgeDisplayed() => Driver.IsElementDisplayed(ShoppingCartBadge);
 
         public bool IsCartBadgeHidden() => Driver.IsElementHidden(ShoppingCartBadge);
 
-        public void GoToCart() => Wait.Until(d => { return d.FindElement(ShoppingCartLink); }).Click();
+        public void GoToCart() => Driver.ClickWhenReady(ShoppingCartLink);
     }
 }

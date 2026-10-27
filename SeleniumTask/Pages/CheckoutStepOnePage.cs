@@ -1,4 +1,5 @@
 ﻿using OpenQA.Selenium;
+using SeleniumTask.Utilities;
 
 namespace SeleniumTask.Pages
 {
@@ -9,12 +10,13 @@ namespace SeleniumTask.Pages
         private static By PostalCodeInput => By.XPath("//input[@placeholder='Zip/Postal Code']");
         private static By ContinueButton => By.XPath("//input[@value='Continue']");
 
-        public void FillFormAndContinue(string firstName, string lastName, string postalCode)
+        public void FillCheckoutForm(string firstName, string lastName, string postalCode)
         {
             Wait.Until(d => d.FindElement(FirstNameInput)).SendKeys(firstName);
             Wait.Until(d => d.FindElement(LastNameInput)).SendKeys(lastName);
             Wait.Until(d => d.FindElement(PostalCodeInput)).SendKeys(postalCode);
-            Wait.Until(d => d.FindElement(ContinueButton)).Click();
         }
+
+        public void ClickContinue() => Driver.ClickWhenReady(ContinueButton);
     }
 }

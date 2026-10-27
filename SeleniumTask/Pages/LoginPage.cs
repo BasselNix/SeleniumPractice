@@ -16,7 +16,7 @@ namespace SeleniumTask.Pages
 
         public void EnterPassword(string password) => Driver.FindElement(PasswordInput).SendKeys(password);
 
-        public void ClickLogin() => Driver.FindElement(LoginButton).Click();
+        public void ClickLogin() => Driver.ClickWhenReady(LoginButton);
 
         public void Login(string username, string password)
         {

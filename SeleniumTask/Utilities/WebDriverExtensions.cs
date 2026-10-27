@@ -10,7 +10,17 @@ namespace SeleniumTask.Utilities
             try
             {
                 var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
-                return wait.Until(d => d.FindElement(locator).Displayed);
+                return wait.Until(d =>
+                {
+                    try
+                    {
+                        return d.FindElement(locator).Displayed;
+                    }
+                    catch (NoSuchElementException)
+                    {
+                        return false;
+                    }
+                });
             }
             catch (WebDriverTimeoutException)
             {
@@ -23,11 +33,45 @@ namespace SeleniumTask.Utilities
             try
             {
                 var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
-                return wait.Until(d => !d.FindElement(locator).Displayed);
+                return wait.Until(d =>
+                {
+                    try
+                    {
+                        return !d.FindElement(locator).Displayed;
+                    }
+                    catch (NoSuchElementException)
+                    {
+                        return true;
+                    }
+                });
             }
             catch (WebDriverTimeoutException)
             {
                 return true;
+            }
+        }
+
+        public static void ClickWhenReady(this IWebDriver driver, By locator, int timeoutSeconds = 10)
+        {
+            var wait = new WebDriverWait(driver, TimeSpan.FromSeconds(timeoutSeconds));
+            try
+            {
+                wait.Until(d =>
+                {
+                    try
+                    {
+                        var element = d.FindElement(locator);
+                        return element.Displayed && element.Enabled ? element : null;
+                    }
+                    catch (NoSuchElementException)
+                    {
+                        return null;
+                    }
+                })?.Click();
+            }
+            catch (WebDriverTimeoutException ex)
+            {
+                throw new WebDriverTimeoutException($"Element located by '{locator}' is not visible, enabled, or clickable.", ex);
             }
         }
     }

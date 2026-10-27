@@ -32,10 +32,6 @@ namespace SeleniumTask.Tests
         }
 
         [TearDown]
-        public override void TearDown()
-        {
-            _productsPage.ResetAppState();
-            base.TearDown();
-        }
+        public void Task3TearDown() => _productsPage.ResetAppState();
     }
 }

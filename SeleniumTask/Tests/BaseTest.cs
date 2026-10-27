@@ -45,7 +45,7 @@ namespace SeleniumTask.Tests
         }
 
         [TearDown]
-        public virtual void TearDown()
+        public void TearDown()
         {
             if (Driver != null)
             {

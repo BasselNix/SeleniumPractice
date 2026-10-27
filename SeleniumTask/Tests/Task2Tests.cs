@@ -24,19 +24,20 @@ namespace SeleniumTask.Tests
             Assert.That(productsPage.IsInventoryContainerDisplayed(), Is.True, "Product list page container is not displayed.");
 
             // Change sorting to Price (Low to High)
-            productsPage.SelectSortOption(ProductSortOption.lohi);
+            productsPage.SelectSortOption(ProductSortOption.ByPriceLowToHigh);
 
             // Verify prices are sorted low to high
             List<decimal> prices = productsPage.GetProductPrices();
             Assert.That(prices, Is.Ordered.Ascending, "Products are not properly sorted by price (Low to High).");
 
-            // Add 'Sauce Labs Bolt T-Shirt' to cart and verify button text changes to 'Remove'
+            // Add 'Sauce Labs Bolt T-Shirt' to cart and verify that it has been added
             string targetProduct1 = "Sauce Labs Bolt T-Shirt";
             productsPage.AddItemToCart(targetProduct1);
-            Assert.That(productsPage.GetItemButtonText(targetProduct1), Is.EqualTo("Remove"), "Button text did not change to 'Remove'.");
-
-            // Check cart count is 1
-            Assert.That(productsPage.GetCartBadgeText(), Is.EqualTo("1"), "Cart item count is not 1.");
+            using (Assert.EnterMultipleScope())
+            {
+                Assert.That(productsPage.GetItemButtonText(targetProduct1), Is.EqualTo("Remove"), "Button text did not change to 'Remove'.");
+                Assert.That(productsPage.GetCartBadgeText(), Is.EqualTo("1"), "Cart item count is not 1.");
+            }
 
             // Save item data
             var savedItem1 = productsPage.GetItemData(targetProduct1);
@@ -46,9 +47,7 @@ namespace SeleniumTask.Tests
             var cartPage = new CartPage(Driver);
             var cartItem1 = cartPage.GetCartItemData(targetProduct1);
 
-            Assert.That(cartItem1.Name, Is.EqualTo(savedItem1.Name), "Product names do not match.");
-            Assert.That(cartItem1.Description, Is.EqualTo(savedItem1.Description), "Product descriptions do not match.");
-            Assert.That(cartItem1.Price, Is.EqualTo(savedItem1.Price), "Product prices do not match.");
+            Assert.That(cartItem1, Is.EqualTo(savedItem1).UsingPropertiesComparer(), "Cart item does not match product.");
 
             // Click Remove & verify cart badge counter is not displayed
             cartPage.RemoveItem(targetProduct1);
@@ -68,14 +67,15 @@ namespace SeleniumTask.Tests
 
             // Fill form and continue
             var checkoutStepOne = new CheckoutStepOnePage(Driver);
-            checkoutStepOne.FillFormAndContinue("Bassel", "Yasser", "123abc");
+            checkoutStepOne.FillCheckoutForm("Bassel", "Yasser", "123abc");
+            checkoutStepOne.ClickContinue();
 
             // On Overview page verify Item Total matches saved price
             var checkoutStepTwo = new CheckoutStepTwoPage(Driver);
             string itemTotalText = checkoutStepTwo.GetItemTotalText();
-            Assert.That(itemTotalText, Does.Contain(savedItem2.Price), $"Item total '{itemTotalText}' does not match item price '{savedItem2.Price}'.");
+            string extractedPrice = itemTotalText.Split(':').Last().Trim();
+            Assert.That(extractedPrice, Is.EqualTo(savedItem2.Price), $"Item total price '{extractedPrice}' does not match saved item price '{savedItem2.Price}'.");
 
-            // Click Finish
             checkoutStepTwo.ClickFinish();
 
             // Verify Pony Express image on Thank You screen
