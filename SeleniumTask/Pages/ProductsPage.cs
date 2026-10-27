@@ -26,10 +26,8 @@ namespace SeleniumTask.Pages
 
         public void ResetAppState()
         {
-            // Open sidebar menu
-            Wait.Until(d => d.FindElement(MenuButton)).Click();
-            // Wait for the sidebar slide-out animation to finish, making the reset link available
-            Wait.Until(d => d.FindElement(ResetSidebarLink).Displayed ? d.FindElement(ResetSidebarLink) : null).Click();
+            Driver.ClickWhenReady(MenuButton);
+            Driver.ClickWhenReady(ResetSidebarLink);
         }
 
         public enum ProductSortOption
